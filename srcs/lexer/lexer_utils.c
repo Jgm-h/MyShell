@@ -26,33 +26,14 @@ int	ft_intlen(int number)
 	return (size);
 }
 
-/*need key lenght and value lenght*/
-char	*ft_strcpy_lexer(char *input, int i, char *env)
+int	ft_keysize_input(char *s1)
 {
-	int		j;
-	int		k;
-	int		key_size;
-	char	*exp;
+	int	i;
 
-	exp = ft_calloc(ft_strlen(input) + ft_strlen(env), sizeof (char));
-	if (!exp)
-		return (NULL);
-	j = -1;
-	k = -1;
-	key_size = 0;
-	while (j++ < i)
-		exp[j] = input[j];
-	while (env[++k])
-		exp[j + k] = env[k];
-	while (input[j + key_size] && input[j + key_size] != ' ' && \
-		input[j + key_size] != '\"' && input[j + key_size] != '\'')
-		key_size++;
-	while (input[j + key_size])
-	{
-		exp[j + k] = input[j + key_size];
-		j++;
-	}
-	return (exp);
+	i = 0;
+	while (s1[i] && s1[i] != ' ' && s1[i] != '\"' && s1[i] != '\'')
+		i++;
+	return (i);
 }
 
 int	ft_keysize(char *envp)
@@ -63,4 +44,19 @@ int	ft_keysize(char *envp)
 	while (envp[i] && envp[i] != '=')
 		i++;
 	return (i + 1);
+}
+
+int	ft_value_expand(char *input, char **envp, int exit_status)
+{
+	int	j;
+
+	j = 0;
+	if (input[1] == '?')
+		return (ft_intlen(exit_status));
+	while (envp[++j])
+	{
+		if (!ft_strcmp_lexer(input, envp[j]))
+			return (ft_strlen(envp[j] + 4));
+	}
+	return (0);
 }

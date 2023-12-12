@@ -11,10 +11,14 @@ int main(int argc, char **argv, char **envp)
 	(void) argv;
 	book = NULL;
 	init(book, envp);
-	input = readline("minishell-1.0$");
-	lexer(book, input);
-	parser(book, argv);
-	exec(book);
+	while (TRUE)
+	{
+		input = readline("minishell-1.0$");
+		lexer(book, input);
+		printf("%s", input);
+//	parser(book, argv);
+//	exec(book);
+	}
 	return (1);
 }
 /*

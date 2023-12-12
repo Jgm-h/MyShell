@@ -1,7 +1,7 @@
 NAME = minishell
 CC = gcc
 RM = rm
-CFLAGS = -Wall -Wextra -Werror -g -pthread -I./libft/includes -I./headers
+CFLAGS = -Wall -Wextra -Werror -g -pthread -I./libft/includes -I./headers -lreadline
 
 
 SRCS = ./main.c \
@@ -10,7 +10,8 @@ SRCS = ./main.c \
 		./parser.c \
 		./lexer.c \
 		./lexer_utils.c \
-		./quotes.c
+		./quotes.c \
+		./parser.c
 
 OBJS_DIR = ./objs
 LIBFT_DIR = ./libft

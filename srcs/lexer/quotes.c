@@ -50,21 +50,40 @@ T_BOOL	check_state(char *input, int pos, T_BOOL in_double, T_BOOL in_simple)
 	can_exp = TRUE;
 	while (i <= pos)
 	{
-		if (input[i] == '\"' && !in_simple)
+		if (input[i] == '\"' && !in_simple && !in_double)
+			in_double = TRUE;
+		else if (input[i] == '\"' && !in_simple && in_double)
+			in_double = FALSE;
+		if (input[i] == '\'' && !in_double && !in_simple)
 		{
-			if (in_double)
-				in_double = FALSE;
-		}
-		if (input[i] == '\'' && !in_double)
-		{
+			in_simple = TRUE;
 			can_exp = FALSE;
-			if (in_simple)
-			{
-				in_simple = FALSE;
-				can_exp = TRUE;
-			}
+		}
+		else if (input[i] == '\'' && !in_double && in_simple)
+		{
+			in_simple = FALSE;
+			can_exp = TRUE;
 		}
 		i++;
 	}
 	return (can_exp);
+}
+
+T_BOOL	check_expand(char *input, int i, t_container *book)
+{
+	int	j;
+
+	j = 0;
+	if (input[i] == '$')
+	{
+		if (input[i + 1] == '?')
+			return (TRUE);
+		while (book->envp[j])
+		{
+			if (!ft_strcmp_lexer(&input[i], (book->envp[j])))
+				return (TRUE);
+			j++;
+		}
+	}
+	return (FALSE);
 }

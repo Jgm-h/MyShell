@@ -24,72 +24,108 @@ T_BOOL	lexer(t_container *book, char *input)
 	return (TRUE);
 }
 
-
-
-/* todo:
- * 		- if the key doesn't exist should clean it out of the string
+/*if FALSE & " on garde
+ * TRUE & " on tej
+ * if true & ' on garde
+ * FALSE & ' on tej
  * */
+void	clean_quotes(char *input)
+{
+	int	i;
+	int	j;
+
+	i = 0;
+	while (input[i])
+	{
+		if ((!check_state(input, i, FALSE, FALSE) && input[i] == '\"') \
+			|| (check_state(input, i, FALSE, FALSE) && input[i] == '\''))
+		{
+			j = i;
+			while (input[j])
+			{
+				input[j] = input[j + 1];
+				j++;
+			}
+		}
+		i++;
+	}
+}
+
 T_BOOL	expand_variables(char *input, t_container *book)
 {
 	int	i;
+	int	tmp;
 
 	i = 0;
 	while (input[i])
 	{
 		if (check_state(input, i, FALSE, FALSE) && check_expand(input, i, book))
 		{
-			input = expand(input, i, book, -1);
-			if (!input)
+			tmp = ft_value_expand(&input[i], book->envp, book->exit_status);
+			if (!expand(&input, book, 0))
 				return (FALSE);
+			i += tmp;
 		}
-		i++;
+		else
+			i++;
 	}
 	return (TRUE);
 }
 
-char	*expand(char *input, int i, t_container *book, int j)
+unsigned int expand(char **input, t_container *book, int i)
 {
-	char	*expanded;
-	char	*exit_status;
-
-	if (input[i + 1] == '?')
-	{
-		exit_status = ft_itoa(book->exit_status);
-		expanded = ft_strcpy_lexer(input, i, exit_status);
-		free(exit_status);
-		free(input);
-		return (expanded);
-	}
-	while (book->envp[++j])
-	{
-		if (!ft_strcmp_lexer(&input[i], (book->envp[j])))
-		{
-			expanded = ft_strcpy_lexer(input, i, book->envp[j] \
-					+ ft_keysize(book->envp[j]));
-			free(input);
-			break ;
-		}
-	}
-	if (!book->envp[j])
-		return (input);
-	return (expanded);
-}
-
-T_BOOL	check_expand(char *input, int i, t_container *book)
-{
-	int	j;
+	int		j;
 
 	j = 0;
-	if (input[i] == '$')
+	if ((*input)[i + 1] == '?')
+		return (ft_expand_exit(input, i, book));
+	while (book->envp[++j])
 	{
-		if (input[i + 1] == '?')
-			return (TRUE);
-		while (book->envp[j])
-		{
-			if (!ft_strcmp_lexer(&input[i], (book->envp[j])))
-				return (TRUE);
-			j++;
-		}
+		if (!ft_strcmp_lexer(input[i], (book->envp[j])))
+			return (ft_strcpy_lexer(input, i, book->envp[j] \
+					+ ft_keysize(book->envp[j])));
 	}
-	return (FALSE);
+	return (ft_strcpy_lexer(input, i, NULL));
+}
+
+unsigned int	ft_expand_exit(char **input, int i, t_container *book)
+{
+	char	*exit_status;
+	T_BOOL	status;
+
+	exit_status = ft_itoa(book->exit_status);
+	if (!exit_status)
+		return (FALSE);
+	status = ft_strcpy_lexer(input, i, exit_status);
+	free(exit_status);
+	return (status);
+}
+
+unsigned int ft_strcpy_lexer(char **input, int i, char *env)
+{
+	int		j;
+	int		k;
+	int		key_size;
+	char	*exp;
+
+	exp = ft_strdup(*input);
+	(*input) = ft_calloc(ft_strlen(*input) + ft_strlen(env) \
+			- ft_keysize_input(&(*input[i])) + 1, sizeof (char));
+	if (!*input)
+		return (FALSE);
+	j = -1;
+	k = -1;
+	key_size = 0;
+	while (++j < i)
+		(*input[j]) = exp[j];
+	while (env[++k])
+		(*input)[j + k] = env[k];
+	key_size = ft_keysize_input(&(exp[i]));
+	while (input[j + key_size])
+	{
+		(*input)[j + k] = exp[j + key_size];
+		j++;
+	}
+	(*input)[j + k] = 0;
+	return (TRUE);
 }

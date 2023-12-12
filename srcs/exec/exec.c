@@ -1,6 +1,6 @@
 #include "minishell.h"
 #include "exec.h"
-
+/*
 void exec(t_container *book)
 {
 	if (!book->head->next)
@@ -20,10 +20,10 @@ void exec_one_cmd(t_container *book, t_token *node)
 	perror(strerror(errno));
 }
 
-/* tries all the paths in env PATH
+ tries all the paths in env PATH
  * todo:
  * 	- have this fonction also check without adding any path to the command
- * */
+ *
 char *find_path(t_container *book,t_token *node)
 {
 	int		i;
@@ -40,3 +40,4 @@ char *find_path(t_container *book,t_token *node)
 	}
 	return (NULL);
 }
+*/

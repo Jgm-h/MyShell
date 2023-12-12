@@ -13,13 +13,30 @@
 # define TRUE 1
 # define FALSE 0
 
-typedef struct s_token{
-	char			*cmd;
-	char			**argv;
-	int				fd_input;
-	int				fd_output;
-	struct s_token	*next;
-}t_token;
+enum e_token_type{
+	AND,
+	OR,
+	PIPE,
+	INPUT_REDIRECTION,
+	HERDOC_REDIRECTION,
+	OUTPUT_REDIRECTION,
+	OUTPUT_ADD_REDIRECTION,
+	COMMAND,
+	FILE_,
+};
+
+typedef struct s_token
+{
+	enum e_token_type	type;
+	union
+	{
+		char	*argv;
+		int		fd;
+		int		pipe[2];
+	};
+	struct s_token		*left;
+	struct s_token		*right;
+}	t_token;
 
 typedef struct s_container{
 	t_token	*head;
