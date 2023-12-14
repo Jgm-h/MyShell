@@ -16,32 +16,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-/*
-int	find_level(char *prompt, int level)
-{
-	int			i;
-	int			parenthese_level;
-	int			len;
-	static char	*strings[] = {
-		"&&", "||", "|", "<", "<<", ">", ">>" };
-
-	len = ft_strlen(strings[level]);
-	i = -1;
-	parenthese_level = 0;
-	while (prompt[++i])
-	{
-		parenthese_level += (prompt[i] == '(') - (prompt[i] == ')');
-		//TODO PARENTHESE ERROR CHECK
-		if (parenthese_level != 0
-			|| ft_strncmp(&prompt[i], strings[level], len))
-			continue ;
-		prompt[i] = 0;
-		prompt[i + (len > 1)] = 0;
-		return (i + len);
-	}
-	//TODO PARENTHESE ERROR CHECK
-	return (-1);
-}
 
 char	*parenthese_trim(char *prompt)
 {
@@ -50,7 +24,7 @@ char	*parenthese_trim(char *prompt)
 	i = ft_strlen(prompt);
 	prompt[0] = 0;
 	if (prompt[i - 1] != ')')
-		; //TODO ERROR
+		return (NULL);
 	prompt[i - 1] = 0;
 	return (&prompt[1]);
 }
@@ -71,6 +45,38 @@ char	*trim_space(char *prompt)
 	return (&prompt[i]);
 }
 
+/*comment ca marche si on a un seul tokken : c'est gerer dans le parser()
+ * */
+int	find_level(char *prompt, int level)
+{
+	int			i;
+	int			parenthese_level;
+	int			len;
+	static char	*strings[] = {
+			"&&", "||", "|", "<<", "<", ">>", ">" };
+
+	len = ft_strlen(strings[level]);
+	i = -1;
+	parenthese_level = 0;
+	while (prompt[++i])
+	{
+		parenthese_level += (prompt[i] == '(') - (prompt[i] == ')');//ignorer si elle est dans une double quote
+		//TODO PARENTHESE ERROR CHECK
+		if (parenthese_level != 0
+			|| ft_strncmp(&prompt[i], strings[level], len))//ignorer si elle est dans une double quote
+			continue ;
+		prompt[i] = 0;
+		prompt[i + (len > 1)] = 0;
+		return (i + len);
+	}
+	//TODO PARENTHESE ERROR CHECK
+	return (-1);
+}
+
+/*TODO:
+ * if  REDIR then set the fd
+ * if PIPE do the pipe[2] later
+ * */
 t_token	*parser(char *prompt)
 {
 	t_token	*res;
@@ -79,7 +85,9 @@ t_token	*parser(char *prompt)
 
 	if (!prompt || !*prompt)
 		return (NULL);
-	res = calloc(1, sizeof(t_token));
+	res = ft_calloc(1, sizeof(t_token));
+	if (!res)
+		return (NULL);
 	prompt = trim_space(prompt);
 	i = -1;
 	index = -1;
@@ -94,102 +102,17 @@ t_token	*parser(char *prompt)
 		return (res);
 	}
 	res->type = i - 1;
-	res->left = parser(prompt);
-	if (res->left == NULL)
-		; //TODO ERROR Tu as oublié de mettre un point virgule
-	res->right = parser(&prompt[index]);
-	if (res->right == NULL)
-		; //TODO ERROR
+	if (prompt)
+	{
+		res->left = parser(prompt);
+		if (res->left == NULL)
+			; //TODO ERROR
+	}
+	if (prompt[index])
+	{
+		res->right = parser(&prompt[index]);
+		if (res->right == NULL)
+			; //TODO ERROR
+	}
 	return (res);
 }
-
-void	print_tree(t_token *tree)
-{
-	if (!tree)
-		return ;
-	print_tree(tree->left);
-	if (tree->type == COMMAND)
-		printf("%s ", tree->argv);
-	if (tree->type == AND)
-		printf("AND ");
-	if (tree->type == OR)
-		printf("OR ");
-	if (tree->type == PIPE)
-		printf("PIPE ");
-	if (tree->type == INPUT_REDIRECTION)
-		printf("INPUT_REDIRECTION ");
-	if (tree->type == HERDOC_REDIRECTION)
-		printf("HERDOC_REDIRECTION ");
-	if (tree->type == OUTPUT_REDIRECTION)	
-		printf("OUTPUT_REDIRECTION ");
-	if (tree->type == OUTPUT_ADD_REDIRECTION)
-		printf("OUTPUT_ADD_REDIRECTION ");
-	printf("\n");
-	print_tree(tree->right);
-}
-
-void	print_intree(t_token *tree)
-{
-	if (!tree)
-		return ;
-	if (tree->type == COMMAND)
-		printf("%s ", tree->argv);
-	if (tree->type == AND)
-		printf("AND ");
-	if (tree->type == OR)
-		printf("OR ");
-	if (tree->type == PIPE)
-		printf("PIPE ");
-	if (tree->type == INPUT_REDIRECTION)
-		printf("INPUT_REDIRECTION ");
-	if (tree->type == HERDOC_REDIRECTION)
-		printf("HERDOC_REDIRECTION ");
-	if (tree->type == OUTPUT_REDIRECTION)	
-		printf("OUTPUT_REDIRECTION ");
-	if (tree->type == OUTPUT_ADD_REDIRECTION)
-		printf("OUTPUT_ADD_REDIRECTION ");
-	printf("\n");
-	print_tree(tree->left);
-	print_tree(tree->right);
-}
-
-void	print_posttree(t_token *tree)
-{
-	if (!tree)
-		return ;
-	print_tree(tree->left);
-	print_tree(tree->right);
-	if (tree->type == COMMAND)
-		printf("%s ", tree->argv);
-	if (tree->type == AND)
-		printf("AND ");
-	if (tree->type == OR)
-		printf("OR ");
-	if (tree->type == PIPE)
-		printf("PIPE ");
-	if (tree->type == INPUT_REDIRECTION)
-		printf("INPUT_REDIRECTION ");
-	if (tree->type == HERDOC_REDIRECTION)
-		printf("HERDOC_REDIRECTION ");
-	if (tree->type == OUTPUT_REDIRECTION)	
-		printf("OUTPUT_REDIRECTION ");
-	if (tree->type == OUTPUT_ADD_REDIRECTION)
-		printf("OUTPUT_ADD_REDIRECTION ");
-	printf("\n");
-}
-
-int	main(int argc, char **argv)
-{
-	t_token	*token;
-
-	token = parser(argv[1]);
-	print_tree(token);
-	printf("next\n\n");
-	print_intree(token);
-	printf("next\n\n");
-	print_posttree(token);
-	printf("next\n\n");
-	
-	return (0);
-}
-*/

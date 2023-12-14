@@ -3,7 +3,7 @@ Lexer
  - [x] Not interpret special characters which are not required by the subject such as\(backslash) or;(semicolon).
  - [x] Handle ’ (single quote) which should prevent the shell from interpreting the meta-characters in the quoted sequence.
  - [x] Handle"(double quote) which should prevent the shell from interpreting the meta-characters in the quoted sequence except for $ (dollar sign).
- - [ ] Handle environment variables ($followed by a sequence of characters) which should expand to their values.
+ - [x] Handle environment variables ($followed by a sequence of characters) which should expand to their values.
  - [x] Handle$?which should expand to the exit status of the most recently executed foreground pipeline
 
 Lexer:
@@ -14,10 +14,8 @@ Lexer:
         je saute en avant i de la taille de la cle;
 
 Parser
- - [ ] Implement commands
- - [ ] Implement redirections
- - [ ] Implement args
- - [ ] Implement pipes
+ - [ ] gestion d'erreur
+ - [ ]
 
 Executeur
  - [ ] Search and launch the right executable (based on the PATH variable or using a relative or an absolute path)
@@ -36,9 +34,20 @@ Gestion d'erreur
 exit_statuts
 
 g_status
- - [ ] Handle ctrl-C,ctrl-D and ctrl-\which should behave like in bash
+ - [x] ctrl-C displays a new prompt on a new line
+ - [ ] ctrl-D exits the shell
+ - [ ] ctrl-\ does nothing
+ - [ ] handle in heredoc status
+ - [ ] clean the ^ notations
+signal,sigaction, sigemptyset, sigadd
+
 
 prompt:
-- [ ] Display a prompt when waiting for a new command
-- [ ] Have a working history
-- [ ] handle empty input
+- [x] Display a prompt when waiting for a new command
+- [x] Have a working history
+- [x] handle empty input
+- [ ] update prompt in fonction of the working directory
+signal,sigaction, sigemptyset, sigadd
+
+
+readline, rl_clear_history, rl_on_new_line,rl_replace_line, rl_redisplay, add_history

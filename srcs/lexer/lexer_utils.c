@@ -8,6 +8,9 @@ int	ft_strcmp_lexer(const char *s1, const char *s2)
 	while (s1[i] && s2[i] && s1[i] != ' ' && \
 		s1[i] != '\"' && s1[i] != '\'' && s1[i] == s2[i])
 		i++;
+	if ((!s1[i] || s1[i] == ' ' || s1[i] == '\"' || \
+		s1[i] != '\'') && s2[i] == '=')
+		return (FALSE);
 	return ((unsigned char)s1[i] - (unsigned char)s2[i]);
 }
 
