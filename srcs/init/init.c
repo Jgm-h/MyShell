@@ -53,15 +53,13 @@ unsigned int	init_paths(t_container *book)
 	i = 0;
 	while (ft_strncmp(book->envp[i], "PATH", 4))
 		i++;
-	book->paths = ft_split(book->envp[i] + 5);
+	book->paths = ft_split(book->envp[i] + 5, ':');
 	if (!book->paths)
 		return (FALSE);
 	i = 0;
 	while (book->paths[i])
 	{
-		hook = book->paths[i];
 		book->paths[i] = ft_strjoin(book->paths[i], "/");
-		free(hook);
 		i++;
 	}
 	return (TRUE);

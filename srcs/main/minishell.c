@@ -2,58 +2,16 @@
 
 volatile extern int	g_status;
 
-void	print_tree(t_token *tree)
-{
-	if (!tree)
-		return ;
-	print_tree(tree->left);
-	if (tree->type == COMMAND)
-		printf("%s ", tree->argv);
-	if (tree->type == AND)
-		printf("AND ");
-	if (tree->type == OR)
-		printf("OR ");
-	if (tree->type == PIPE)
-		printf("PIPE ");
-	if (tree->type == INPUT_REDIRECTION)
-		printf("INPUT_REDIRECTION ");
-	if (tree->type == HERDOC_REDIRECTION)
-		printf("HERDOC_REDIRECTION ");
-	if (tree->type == OUTPUT_REDIRECTION)
-		printf("OUTPUT_REDIRECTION ");
-	if (tree->type == OUTPUT_ADD_REDIRECTION)
-		printf("OUTPUT_ADD_REDIRECTION ");
-	printf("\n");
-	print_tree(tree->right);
-}
-
 void	input_handling(t_container *book, char **input)
 {
 	book->prompt = ft_strjoin("minishell-2.0$", book->cwd);
 	if (!book->prompt)
-		exit(1);//exit_minishell(book, input);
+		my_perror("minishell-2.0: malloc error");
 	*input = readline(book->prompt);
 	if (!*input)
-		exit(1);//exit_minishell(book, input);
+		my_perror("minishell-2.0: exit");
 	add_history(*input);
 }
-/*
-T_BOOL	exec(t_token *token)
-{
-	if (token->type == AND)
-	{
-		if (exec(token->left))
-			exec(token->right);
-	}
-	if (token->type == OR)
-	{
-		if (!exec(token->left))
-			exec(token->right);
-	}
-	if (token->type == PIPE)
-		return (exec_pipe(token->left, token->right));
-	if (token->type)
-}*/
 
 int	minishell(t_container *book)
 {
@@ -61,6 +19,8 @@ int	minishell(t_container *book)
 
 	while (book)
 	{
+		g_status = NEW_LINE;
+		book->in_pipe = FALSE;
 		input_handling(book, &input);
 		if (!input)
 			continue ;
@@ -68,10 +28,8 @@ int	minishell(t_container *book)
 			continue ;
 		book->head = parser(input);
 		free(input);
-		print_tree(book->head);
-		if (g_status == NEW_LINE)
-			book->exit_status = 130;
-//	exec(book);
+		if (!exec(book))
+			book->exit_status = errno;
 	}
 	//free_all(book, token);
 	return (1);

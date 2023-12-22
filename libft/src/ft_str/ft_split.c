@@ -12,18 +12,18 @@
 
 #include"../../includes/libft.h"
 
-int	ft_checksep(char str)
+int	ft_checksep(char str, char c)
 {
 	int	i;
 
-	if (!str || str == ':')
+	if (!str || str == c)
 		i = 1;
 	else
 		i = 0;
 	return (i);
 }
 
-int	ft_wordcount(char *str)
+int	ft_wordcount(char *str, char c)
 {
 	int	count;
 	int	state;
@@ -32,9 +32,9 @@ int	ft_wordcount(char *str)
 	state = 1;
 	while (*str)
 	{
-		if (ft_checksep(*str) && state == 0)
+		if (ft_checksep(*str, c) && state == 0)
 			state = 1;
-		if (state == 1 && !ft_checksep(*str))
+		if (state == 1 && !ft_checksep(*str, c))
 		{
 			state = 0;
 			count++;
@@ -44,7 +44,7 @@ int	ft_wordcount(char *str)
 	return (count);
 }
 
-char	*ft_word(char *str)
+char	*ft_word(char *str, char c)
 {
 	char	*strs;
 	int		size;
@@ -54,7 +54,7 @@ char	*ft_word(char *str)
 	size = 0;
 	i = 0;
 	j = 0;
-	while (!ft_checksep(str[i]) && str[i])
+	while (!ft_checksep(str[i], c) && str[i])
 	{
 		size++;
 		i++;
@@ -73,7 +73,7 @@ char	*ft_word(char *str)
 	return (strs);
 }
 
-char	**ft_split(char *str)
+char	**ft_split(char *str, char c)
 {
 	int		size;
 	char	**tab;
@@ -81,17 +81,17 @@ char	**ft_split(char *str)
 
 	if (!str)
 		return ((void *) 0);
-	size = ft_wordcount(str);
+	size = ft_wordcount(str, c);
 	i = 0;
 	tab = malloc(sizeof(char *) * (size + 1));
 	if (!tab)
 		exit(0);
 	while (i < size)
 	{
-		while (ft_checksep(*str))
+		while (ft_checksep(*str, c))
 			str++;
-		tab[i] = ft_word(str);
-		while (*str && !ft_checksep(*str))
+		tab[i] = ft_word(str, c);
+		while (*str && !ft_checksep(*str, c))
 			str++;
 		i++;
 	}

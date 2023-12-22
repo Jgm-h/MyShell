@@ -2,7 +2,7 @@
 #include "minishell.h"
 #include "libft.h"
 
-volatile int	g_status = PROMPT;
+volatile int	g_status = NEW_LINE;
 
 int main(int argc, char **argv, char **envp)
 {
@@ -28,14 +28,14 @@ int main(int argc, char **argv, char **envp)
 //		printf("OR ");
 //	if (tree->type == PIPE)
 //		printf("PIPE ");
-//	if (tree->type == INPUT_REDIRECTION)
-//		printf("INPUT_REDIRECTION ");
-//	if (tree->type == HERDOC_REDIRECTION)
-//		printf("HERDOC_REDIRECTION ");
-//	if (tree->type == OUTPUT_REDIRECTION)
-//		printf("OUTPUT_REDIRECTION ");
-//	if (tree->type == OUTPUT_ADD_REDIRECTION)
-//		printf("OUTPUT_ADD_REDIRECTION ");
+//	if (tree->type == IN_REDIR)
+//		printf("IN_REDIR ");
+//	if (tree->type == HERDOC)
+//		printf("HERDOC ");
+//	if (tree->type == OUT_REDIR)
+//		printf("OUT_REDIR ");
+//	if (tree->type == APD_REDIR)
+//		printf("APD_REDIR ");
 //	printf("\n");
 //	print_tree(tree->left);
 //	print_tree(tree->right);
@@ -55,13 +55,13 @@ int main(int argc, char **argv, char **envp)
 //		printf("OR ");
 //	if (tree->type == PIPE)
 //		printf("PIPE ");
-//	if (tree->type == INPUT_REDIRECTION)
-//		printf("INPUT_REDIRECTION ");
-//	if (tree->type == HERDOC_REDIRECTION)
-//		printf("HERDOC_REDIRECTION ");
-//	if (tree->type == OUTPUT_REDIRECTION)
-//		printf("OUTPUT_REDIRECTION ");
-//	if (tree->type == OUTPUT_ADD_REDIRECTION)
-//		printf("OUTPUT_ADD_REDIRECTION ");
+//	if (tree->type == IN_REDIR)
+//		printf("IN_REDIR ");
+//	if (tree->type == HERDOC)
+//		printf("HERDOC ");
+//	if (tree->type == OUT_REDIR)
+//		printf("OUT_REDIR ");
+//	if (tree->type == APD_REDIR)
+//		printf("APD_REDIR ");
 //	printf("\n");
 //}

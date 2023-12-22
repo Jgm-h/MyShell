@@ -6,14 +6,27 @@ CFLAGS = -Wall -Wextra -Werror -g -I./libft/includes -I./headers
 
 SRCS = ./main.c \
 		./minishell.c \
+		./signals.c \
 		./init.c \
-		./exec.c \
-		./parser.c \
 		./lexer.c \
+		./lexer_token.c \
+		./lexer_token2.c \
+		./lexer_token3.c \
 		./lexer_utils.c \
 		./quotes.c \
 		./parser.c \
-		./signals.c \
+		./exec.c \
+		./exec_redir.c \
+		./one_cmd.c \
+		./utils1.c \
+		./echo.c \
+        ./cd.c	\
+        ./pwd.c \
+        ./export.c \
+        ./unset.c \
+        ./env.c \
+        ./exit.c \
+
 
 OBJS_DIR = ./objs
 LIBFT_DIR = ./libft
@@ -25,7 +38,8 @@ SRCS_DIR = ./srcs/main \
 			./srcs/lexer \
 			./srcs/builtins \
 			./srcs/parser \
-			./srcs/signals
+			./srcs/signals \
+			./srcs/utils
 
 OBJS = $(addprefix $(OBJS_DIR)/, $(notdir $(SRCS:.c=.o)))
 

@@ -1,3 +1,6 @@
+Minishell
+ - [ ] free_all
+
 Lexer
  - [x] Not interpret unclosed quotes
  - [x] Not interpret special characters which are not required by the subject such as\(backslash) or;(semicolon).
@@ -5,6 +8,10 @@ Lexer
  - [x] Handle"(double quote) which should prevent the shell from interpreting the meta-characters in the quoted sequence except for $ (dollar sign).
  - [x] Handle environment variables ($followed by a sequence of characters) which should expand to their values.
  - [x] Handle$?which should expand to the exit status of the most recently executed foreground pipeline
+ - [ ] split avant d'expand et de clean les quotes
+ - [ ] mieux clean les redirs
+ - [x] expand after the tokenization
+ - [x] clean quotes after the tokenization
 
 Lexer:
     - expand:
@@ -15,30 +22,39 @@ Lexer:
 
 Parser
  - [ ] gestion d'erreur
- - [ ]
 
 Executeur
- - [ ] Search and launch the right executable (based on the PATH variable or using a relative or an absolute path)
+ - [x] Search and launch the right executable (based on the PATH variable or using a relative or an absolute path)
+ - [x] check && is false
+ - [x] check how to handle heredoc in redir:
+        - [x] if heredoc abort stop the execution (probleme for ||)
+        - [x] clean the heredoc generation
+ - [ ] expand wildcards
  - [ ] Implement pipes
  - [ ] builtins:
-    - [ ] echo with option-n
-    - [ ] cd with only a relative or absolute path
-    - [ ] pwd with no options
-    - [ ] export with no options
-    - [ ] unset with no options
-    - [ ] env with no options or arguments
-    - [ ] exit with no options6
+    - [ ] if tree
+    - [x] echo with option-n
+    - [x] cd with only a relative or absolute path
+    - [x] pwd with no options
+    - [x] export with no options
+    - [x] unset with no options
+    - [x] env with no options or arguments
+    - [ ] exit with no options
+    - [x] have all builtins return T_BOOL
+    - [x] update errno
 
 Gestion d'erreur
 
 exit_statuts
+ - [x] get exit_status at the end of execution
 
 g_status
  - [x] ctrl-C displays a new prompt on a new line
- - [ ] ctrl-D exits the shell
- - [ ] ctrl-\ does nothing
- - [ ] handle in heredoc status
- - [ ] clean the ^ notations
+ - [x] ctrl-D exits the shell
+ - [x] ctrl-\ does nothing
+ - [x] handle in heredoc status
+ - [x] clean the ^ notations
+ - [ ] handle in execution and new_line
 signal,sigaction, sigemptyset, sigadd
 
 
@@ -46,7 +62,6 @@ prompt:
 - [x] Display a prompt when waiting for a new command
 - [x] Have a working history
 - [x] handle empty input
-- [ ] update prompt in fonction of the working directory
 signal,sigaction, sigemptyset, sigadd
 
 
