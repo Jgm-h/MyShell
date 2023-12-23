@@ -24,6 +24,7 @@
 void			init(t_container **book, char **envp, int argc);
 unsigned int	lexer(t_container *book, char **input);
 t_token			*parser(char *prompt);
+T_BOOL			lexer_token(t_token *leaf, t_container *book);
 void			signal_handler(int signal);
 int				minishell(t_container *book);
 T_BOOL			exec(t_container *book);

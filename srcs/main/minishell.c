@@ -27,6 +27,7 @@ int	minishell(t_container *book)
 		if (!lexer(book, &input))
 			continue ;
 		book->head = parser(input);
+		lexer_token(book->head, book);
 		free(input);
 		if (!exec(book))
 			book->exit_status = errno;

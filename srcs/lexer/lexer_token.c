@@ -1,24 +1,91 @@
 #include "minishell.h"
 
+
+
+int skip_till_redir(char *str, T_BOOL cmd)
+{
+	int	i;
+	T_BOOL in_double;
+	T_BOOL in_single;
+
+	i = 0;
+	in_single = FALSE;
+	in_double = FALSE;
+	while (str[i])
+	{
+		if ((str[i] == '|' || str[i] == '&') && (!in_double || !in_single))
+			cmd = FALSE;
+		else if (str[i] == '\'' && !in_double)
+			in_single = !in_single;
+		else if (str[i] == '\"' && !in_single)
+			in_double = !in_double;
+		else if ((str[i] == '<' || str[i] == '>') && cmd)
+			while (ft_isalnum(str[i]))
+				i++;
+		else if (ft_isalnum(str[i]))
+			cmd = TRUE;
+		else if ((str[i] == '<' || str[i] == '>') && !cmd)
+			break;
+		i++;
+	}
+	return (i);
+}
+
+char *save_redir(char *str)
+{
+	char	*ret;
+	int		i;
+
+	i = 0;
+	while (str[i] && (str[i] == '<' || str[i] == '>'))
+		i++;
+	while (str[i] && ft_isalnum(str[i]))
+		i++;
+	ret = ft_calloc(i + 1, sizeof(char));
+	while (str[i] && (str[i] == '<' || str[i] == '>'))
+	{
+		ret[i] = str[i];
+		i++;
+	}
+	while (str[i] && ft_isalnum(str[i]))
+	{
+		ret[i] = str[i];
+		i++;
+	}
+	return (ret);
+}
+
+int	copy_cmd(char *str)
+{
+	int		i;
+
+	i = 0;
+	while (str[i] && (str[i] == '<' || str[i] == '>'))
+		i++;
+	while (str[i] && ft_isalnum(str[i]))
+		i++;
+}
+
+/* elle recoit un pointeur vers une string
+ * quand elle rencontre une redirection
+ * */
 T_BOOL	lexer_redir_clean(char **input)
 {
 	int	i;
+	char *redir;
 
 	i = 0;
+	i += skip_till_redir((*input), FALSE);
 	while ((*input)[i])
 	{
-		if ((*input)[i] == '<' && (*input)[i + 1] == '<')
-		{
-			if (check_redir((*input), i) && \
-			!redir_clean_heredoc(input, i, 0))
-				return (FALSE);
-		}
+		i += skip_till_redir((*input), TRUE);
 		if ((*input)[i] == '<' || (*input)[i] == '>')
 		{
-			if (check_redir((*input), i) && !redir_clean(input, i, -1, -1))
-				return (FALSE);
+			redir = save_redir(&(*input)[i]);
+			i += copy_cmd(&(*input)[i]);
+			i += copy_redir(&(*input)[i]);
+			free(redir);
 		}
-		i++;
 	}
 	return (TRUE);
 }
@@ -94,22 +161,29 @@ void	alloc(char *input, t_token *leaf, T_BOOL simp, T_BOOL doub)
 		(*input == '\'' && !doub) || (*input == '\"' && !simp)))
 			input++;
 	}
-	leaf->args = ft_calloc(i, sizeof(char *));
+	leaf->args = ft_calloc(i + 1, sizeof(char *));
 }
 
-int	word_len(char *str)
+int	ft_small_split(char *str, char **to_copy, int size, int ign)
 {
 	T_BOOL	simp;
 	T_BOOL	doub;
-	int		size;
-	int		ign;
 
 	simp = FALSE;
 	doub = FALSE;
+	while (str[size + ign] && !((str[size + ign] == ' ' && !simp && !doub) || \
+	(str[size + ign] == '\'' && !doub) || (str[size + ign] == '\"' && !simp)))
+		size++;
+	(*to_copy) = ft_calloc(size + 1, sizeof(char));
 	size = 0;
-	ign = 0;
-	while (str[ign] && !((str[ign] == ' ' && !simp && !doub) || \
-		(str[ign] == '\'' && !doub) || (str[ign] == '\"' && !simp)))
+	while (str[size + ign] && !((str[size + ign] == ' ' && !simp && !doub) || \
+	(str[size + ign] == '\'' && !doub) || (str[size + ign] == '\"' && !simp)))
+	{
+		(*to_copy)[size] = str[ign + size];
+		size++;
+	}
+	while (str[size + ign] && ((str[size + ign] == ' ' && !simp && !doub) || \
+		(str[size + ign] == '\'' && !doub) || (str[size + ign] == '\"' && !simp)))
 	{
 		if (*str == '\"' && !simp)
 			doub = !doub;
@@ -117,10 +191,7 @@ int	word_len(char *str)
 			simp = !simp;
 		ign++;
 	}
-	while (str[size + ign] && !((str[size + ign] == ' ' && !simp && !doub) || \
-	(str[size + ign] == '\'' && !doub) || (str[size + ign] == '\"' && !simp)))
-		size++;
-
+	return (size + ign);
 }
 
 void	split_var(char *input, t_token *leaf, T_BOOL simp, T_BOOL doub)
@@ -131,9 +202,12 @@ void	split_var(char *input, t_token *leaf, T_BOOL simp, T_BOOL doub)
 	i = 0;
 	j = 0;
 	alloc(input, leaf, FALSE, FALSE);
+	while(input[i] == ' ' || input[i] == '\'' || input[i] == '\"')
+		i++;
 	while (input[i])
 	{
-		i = ft_small_split(leaf->args[j++], &input[i]);
+		i += ft_small_split(&input[i], &(leaf->args[j]), 0, 0);
+		j++;
 	}
 }
 /* check recursively for each token with type COMMAND
