@@ -1,5 +1,5 @@
 Minishell
- - [ ] free_all
+ - [x] free_all
 
 Lexer
  - [x] Not interpret unclosed quotes
@@ -9,7 +9,7 @@ Lexer
  - [x] Handle environment variables ($followed by a sequence of characters) which should expand to their values.
  - [x] Handle$?which should expand to the exit status of the most recently executed foreground pipeline
  - [x] split avant d'expand et de clean les quotes
- - [ ] mieux clean les redirs
+ - [?] mieux clean les redirs
  - [x] expand after the tokenization
  - [x] clean quotes after the tokenization
 
@@ -20,26 +20,25 @@ Lexer:
         je remplace la var d'env a la position i dans l'input;
         je saute en avant i de la taille de la cle;
 
-Parser
- - [ ] gestion d'erreur
-
 Executeur
  - [x] Search and launch the right executable (based on the PATH variable or using a relative or an absolute path)
  - [x] check && is false
  - [x] check how to handle heredoc in redir:
         - [x] if heredoc abort stop the execution (probleme for ||)
         - [x] clean the heredoc generation
- - [ ] expand wildcards
- - [ ] Implement pipes
- - [ ] builtins:
-    - [ ] if tree
+ - [x] expand wildcards
+ - [ ] Implement pipes:
+    - [ ] i should wait for groups and cmds
+ - [x] builtins:
+    - [ ] which should execute in child or not
+    - [x] if tree
     - [x] echo with option-n
     - [x] cd with only a relative or absolute path
     - [x] pwd with no options
     - [x] export with no options
     - [x] unset with no options
     - [x] env with no options or arguments
-    - [ ] exit with no options
+    - [x] exit with no options
     - [x] have all builtins return T_BOOL
     - [x] update errno
 
@@ -54,7 +53,7 @@ g_status
  - [x] ctrl-\ does nothing
  - [x] handle in heredoc status
  - [x] clean the ^ notations
- - [ ] handle in execution and new_line
+ - [x] handle in execution and new_line
 signal,sigaction, sigemptyset, sigadd
 
 
@@ -66,3 +65,5 @@ signal,sigaction, sigemptyset, sigadd
 
 
 readline, rl_clear_history, rl_on_new_line,rl_replace_line, rl_redisplay, add_history
+
+Tests:

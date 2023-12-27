@@ -26,6 +26,8 @@ SRCS = ./main.c \
         ./unset.c \
         ./env.c \
         ./exit.c \
+        ./free_all.c \
+        ./if_tree.c
 
 
 OBJS_DIR = ./objs
@@ -39,7 +41,8 @@ SRCS_DIR = ./srcs/main \
 			./srcs/builtins \
 			./srcs/parser \
 			./srcs/signals \
-			./srcs/utils
+			./srcs/utils \
+			./srcs/free
 
 OBJS = $(addprefix $(OBJS_DIR)/, $(notdir $(SRCS:.c=.o)))
 
@@ -54,6 +57,8 @@ $(NAME) : $(OBJS)
 	$ make -C $(LIBFT_DIR)
 	$(CC) $(CFLAGS)  $(SAN) $(LIBFT_A) -o $@ $^ -lreadline -L$(HOME)/.brew/opt/readline/lib
 
+test: test.c
+	gcc -o test test.c
 
 $(OBJS_DIR) :
 	@mkdir -p $(OBJS_DIR)

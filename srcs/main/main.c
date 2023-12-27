@@ -12,7 +12,8 @@ int main(int argc, char **argv, char **envp)
 	(void) argv;
 	signal(SIGINT, signal_handler);
 	signal(SIGQUIT, signal_handler);
-	init(&book, envp, argc);
+	if (!init(&book, envp, argc))
+		return (1);
 	return (minishell(book));
 }
 

@@ -1,7 +1,5 @@
 #include "minishell.h"
 
-
-
 int skip_till_redir(char *str, T_BOOL cmd)
 {
 	int	i;
@@ -24,68 +22,141 @@ int skip_till_redir(char *str, T_BOOL cmd)
 				i++;
 		else if (ft_isalnum(str[i]))
 			cmd = TRUE;
-		else if ((str[i] == '<' || str[i] == '>') && !cmd)
+		else if ((str[i] == '<' || str[i] == '>') && !cmd && !in_single && !in_double)
 			break;
+		i++;
+	}
+	if (!str[i])
+		return (-1);
+	if (i == 0)
+		return (0);
+	return (i - 1);
+}
+
+char	*split_till_redir(char *input, int i)
+{
+	char	*ret;
+	int		j;
+
+	j = 0;
+	if (i == 0)
+		return (NULL);
+	ret = ft_calloc(i + 1, sizeof (char));
+	while (j <= i)
+	{
+		ret[j] = input[j];
+		j++;
+	}
+	return (ret);
+}
+
+char	*split_redir(char *input, int *i)
+{
+	int		j;
+	int		ind;
+	char	*ret;
+
+	j = (*i);
+	ind = 0;
+	if (!input[*i])
+		return (NULL);
+	while(input[(*i)] && input[(*i)] != '\'' && input[(*i)] != '\"' && !(input[(*i)] == ' ' && ft_isalpha(input[(*i) + 1])))
+		(*i)++;
+	ret = ft_calloc((*i) - j + 1, sizeof (char));
+	while (j < (*i))
+		ret[ind++] = input[j++];
+	return (ret);
+}
+
+int		get_len(char *str, T_BOOL in_double, T_BOOL in_single)
+{
+	int	i;
+
+	i = 0;
+	while (str[i])
+	{
+		if ((str[i] == '|' || str[i] == '&') && (!in_double || !in_single))
+			break ;
+		else if (str[i] == '\'' && !in_double)
+			in_single = !in_single;
+		else if (str[i] == '\"' && !in_single)
+			in_double = !in_double;
+		else if (ft_isalnum(str[i]))
+			while (ft_isalnum(str[i]))
+				i++;
 		i++;
 	}
 	return (i);
 }
 
-char *save_redir(char *str)
+char	*split_cmd(char *input, int *i)
 {
+	int		j;
+	int		ind;
 	char	*ret;
-	int		i;
 
-	i = 0;
-	while (str[i] && (str[i] == '<' || str[i] == '>'))
-		i++;
-	while (str[i] && ft_isalnum(str[i]))
-		i++;
-	ret = ft_calloc(i + 1, sizeof(char));
-	while (str[i] && (str[i] == '<' || str[i] == '>'))
-	{
-		ret[i] = str[i];
-		i++;
-	}
-	while (str[i] && ft_isalnum(str[i]))
-	{
-		ret[i] = str[i];
-		i++;
-	}
+	ind = 0;
+	if (!input[*i])
+		return (NULL);
+	j = get_len(&input[*i], FALSE, FALSE);
+	ret = ft_calloc(get_len(&input[*i], FALSE, FALSE), sizeof(char));
+	j += (*i);
+	while (*i <= j)
+		ret[ind++] = input[(*i)++];
 	return (ret);
 }
 
-int	copy_cmd(char *str)
+char	*split_end(char *input, int i)
 {
-	int		i;
+	int	j;
+	char	*ret;
 
-	i = 0;
-	while (str[i] && (str[i] == '<' || str[i] == '>'))
-		i++;
-	while (str[i] && ft_isalnum(str[i]))
-		i++;
+	j = i;
+	if (!input[i])
+		return (NULL);
+	while (input[j])
+		j++;
+	ret = ft_calloc(j - i + 1, sizeof (char));
+	j = 0;
+	while (input[i])
+		ret[j++] = input [i++];
+	return (ret);
+}
+
+void ft_reassemble(char ***split)
+{
+	(*split)[0] = ft_strjoin((*split)[0], (*split)[2]);
+	(*split)[0] = ft_strjoin((*split)[0], (*split)[1]);
+	(*split)[0] = ft_strjoin((*split)[0], (*split)[3]);
 }
 
 /* elle recoit un pointeur vers une string
  * quand elle rencontre une redirection
+ * cette solution a un souci quand redir size != cmd size
+ * need to split it up and join
  * */
 T_BOOL	lexer_redir_clean(char **input)
 {
 	int	i;
-	char *redir;
+	char **split;
 
 	i = 0;
-	i += skip_till_redir((*input), FALSE);
+	split = ft_calloc(5, sizeof(char *));
 	while ((*input)[i])
 	{
-		i += skip_till_redir((*input), TRUE);
-		if ((*input)[i] == '<' || (*input)[i] == '>')
+		i = skip_till_redir((*input), FALSE);
+		if (i == -1)
 		{
-			redir = save_redir(&(*input)[i]);
-			i += copy_cmd(&(*input)[i]);
-			i += copy_redir(&(*input)[i]);
-			free(redir);
+			free_array(split);
+			break ;
 		}
+		split[0] = split_till_redir((*input), i);
+		split[1] = split_redir((*input), &i);
+		split[2] = split_cmd((*input), &i);
+		split[3] = split_end((*input), i);
+		ft_reassemble(&split);
+		free((*input));
+		(*input) =  split[0];
 	}
 	return (TRUE);
 }
@@ -194,7 +265,7 @@ int	ft_small_split(char *str, char **to_copy, int size, int ign)
 	return (size + ign);
 }
 
-void	split_var(char *input, t_token *leaf, T_BOOL simp, T_BOOL doub)
+void	split_var(char *input, t_token *leaf)
 {
 	int	i;
 	int	j;
@@ -224,7 +295,7 @@ T_BOOL	lexer_token(t_token *leaf, t_container *book)
 				lexer_token(leaf->right, book));
 	if (leaf->type == COMMAND)
 	{
-		split_var(leaf->argv, leaf, FALSE, FALSE);
+		split_var(leaf->argv, leaf);
 		while (leaf->args[i])
 		{
 			if (!expand_variables(&(leaf->args[i]), book))

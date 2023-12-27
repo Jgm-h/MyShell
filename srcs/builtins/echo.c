@@ -1,6 +1,6 @@
 #include "builtins.h"
 
-T_BOOL	echo(t_token *leaf, t_container *book, t_pipes pipes)
+T_BOOL	echo(t_token *leaf, t_pipes pipes)
 {
 	T_BOOL	option;
 	int		i;

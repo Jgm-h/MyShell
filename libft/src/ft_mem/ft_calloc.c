@@ -18,10 +18,7 @@ void	*ft_calloc(int count, int size)
 
 	tab = malloc(size * count);
 	if (!tab)
-	{
-		perror("minishell-2.0: malloc error");
 		exit(1);
-	}
 	ft_bzero(tab, size * count);
 	return (tab);
 }

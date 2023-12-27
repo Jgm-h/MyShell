@@ -11,9 +11,9 @@ int	env(t_token *leaf, t_container *book)
 	i = 0;
 	if (leaf->args[1])
 	{
-		perror("env:");
-		perror(leaf->args[1]);
-		perror(": No such file or directory");
+		my_print_error("env:");
+		my_print_error(leaf->args[1]);
+		my_print_error(": No such file or directory");
 		errno = 127;
 		return (ERROR);
 	}

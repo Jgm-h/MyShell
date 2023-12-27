@@ -4,7 +4,6 @@ char	**get_env_paths(char **envp)
 {
 	int		i;
 	char	**paths;
-	char	*to_free;
 
 	i = 0;
 	while (ft_strncmp(envp[i], "PATH=", 5))
@@ -18,9 +17,7 @@ char	**get_env_paths(char **envp)
 	return (paths);
 }
 
-/*should test for existence
- * */
-char	*find_path(t_token *leaf, t_container *book, int i, char *arg)
+char	*find_path(t_container *book, int i, char *arg)
 {
 	char	**env_paths;
 	char	*pathed;
@@ -37,7 +34,7 @@ char	*find_path(t_token *leaf, t_container *book, int i, char *arg)
 			return (NULL);
 		if (!access(pathed, F_OK))
 		{
-			free_split(env_paths);
+			free_split(env_paths); //check que j'ai pas deja tout free
 			return (pathed);
 		}
 	}
@@ -58,29 +55,32 @@ void	child(int *pipes, t_token *leaf, t_pipes pipes_exec, t_container *book)
 		close(pipes[1]);
 	}
 	execve(leaf->args[0], leaf->args, book->envp);
-	perror("minishell: execution failed");
+	my_print_error("minishell: execution failed");
 }
 
+/*TODO:
+ * 	- [ ] check how heredoc and STDIN interact
+ * */
 int	execute(t_token *leaf, t_container *book, t_pipes pipes_exec)
 {
-	int		status;
 	int		pipes[2];
 
-	if (leaf->heredoc && !pipes_exec.in)
+	if (leaf->heredoc)
 	{
 		if (pipe(pipes) == -1)
-			my_perror("pipe");
+			my_perror("pipe", book);
 	}
-	// if check builtin
-	// execute_builtins;
 	if (fork1() == 0)
+	{
+		if (leaf->heredocgit )
+			dup2(pipes[1], STDIN_FILENO);
+		if (check_builtin(leaf->args[0]))
+			execute_builtins(leaf, book, pipes_exec);
 		child(pipes, leaf, pipes_exec, book);
-	status = 0;
-	if (leaf->heredoc && !pipes_exec.in)
+	}
+	dup2(pipe[1], STDOUT_FILENO);
+	if (leaf->heredoc)
 		manage_heredoc(leaf, pipes);
-	if (wait(&status) == -1)
-		my_perror("waitpid");
-	return (WEXITSTATUS(status));
 }
 
 int	exec_one_cmd(t_token *leaf, t_container *book, t_pipes pipes)
@@ -90,7 +90,7 @@ int	exec_one_cmd(t_token *leaf, t_container *book, t_pipes pipes)
 	leaf->args = ft_split(leaf->argv, ' ');
 	if (!leaf->args)
 		return (FALSE);
-	path = find_path(leaf, book, -1, leaf->args[0]);
+	path = find_path(book, -1, leaf->args[0]);
 	if (!path)
 	{
 		ft_putstr_fd((char *)"minishell: ", STDERR_FILENO);

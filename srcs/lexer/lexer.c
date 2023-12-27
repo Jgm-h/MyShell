@@ -107,7 +107,7 @@ T_BOOL	redir_clean(char **input, int i, int k, int j)
  * handle $ followed by env variables
  * handle $? by expanding it to the exit_status
  * */
-T_BOOL	lexer(t_container *book, char **input)
+T_BOOL	lexer(char **input)
 {
 	if (!check_empty_prompt(*input))
 		return (FALSE);
@@ -115,7 +115,7 @@ T_BOOL	lexer(t_container *book, char **input)
 		return (FALSE);
 	if (!check_pipe_position(*input))
 	{
-		perror("syntax error near unexpected token `|'\n");
+		my_print_error("syntax error near unexpected token `|'\n");
 		return (FALSE);
 	}
 	if (!check_heredoc_alone(*input, 0, FALSE))

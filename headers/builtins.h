@@ -6,8 +6,12 @@
 #define MINISHELL_BUILTINS_H
 # include "minishell.h"
 
-int		pwd(t_token *leaf, t_container *);
-T_BOOL	echo(t_token *leaf, t_container *book, t_pipes pipes);
-
+int		pwd(void);
+T_BOOL	echo(t_token *leaf, t_pipes pipes);
+T_BOOL	cd(t_token *leaf, t_container *book);
+int		env(t_token *leaf, t_container *book);
+void	my_exit(t_token *leaf, t_container *book);
+T_BOOL	export(t_token *leaf, t_container *book);
+T_BOOL	unset(t_token *leaf, t_container *book);
 
 #endif //MINISHELL_BUILTINS_H

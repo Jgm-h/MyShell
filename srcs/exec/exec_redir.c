@@ -19,7 +19,7 @@ int	get_redir_fd_side(char *file, enum e_token_type type)
 		fd = open(file, O_WRONLY);
 	}
 	if (fd == -1)
-		perror("minishell-2.0: open failed");
+		my_print_error("minishell-2.0: open failed");
 	return (fd);
 }
 
@@ -32,7 +32,7 @@ T_BOOL	inside_heredoc(t_token *leaf, char *input, char *eof)
 	}
 	leaf->heredoc = ft_strjoin(leaf->heredoc, input);
 	if (!leaf->heredoc)
-		my_perror("minishell-2.0: malloc failed");
+		my_print_error("minishell-2.0: malloc failed");
 	return (TRUE);
 }
 

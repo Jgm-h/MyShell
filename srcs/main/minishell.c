@@ -4,12 +4,9 @@ volatile extern int	g_status;
 
 void	input_handling(t_container *book, char **input)
 {
-	book->prompt = ft_strjoin("minishell-2.0$", book->cwd);
-	if (!book->prompt)
-		my_perror("minishell-2.0: malloc error");
 	*input = readline(book->prompt);
 	if (!*input)
-		my_perror("minishell-2.0: exit");
+		my_print_error("minishell-2.0: exit");
 	add_history(*input);
 }
 
@@ -24,14 +21,15 @@ int	minishell(t_container *book)
 		input_handling(book, &input);
 		if (!input)
 			continue ;
-		if (!lexer(book, &input))
+		if (!lexer(&input))
 			continue ;
+		printf("%s", input);
 		book->head = parser(input);
 		lexer_token(book->head, book);
 		free(input);
-		if (!exec(book))
-			book->exit_status = errno;
+//		if (!exec(book))
+//			book->exit_status = errno;
 	}
-	//free_all(book, token);
+	free_all(book);
 	return (1);
 }

@@ -12,9 +12,9 @@ T_BOOL	check_unvalid(char *key)
 {
 	if (!ft_isalpha(key[0]) && key[0] != '_')
 	{
-		perror("minishell-2.0: unset: `");
-		perror(key);
-		perror("': not a valid identifier");
+		my_print_error("minishell-2.0: unset: `");
+		my_print_error(key);
+		my_print_error("': not a valid identifier");
 		return (ERROR);
 	}
 	return (SUCCESS);
@@ -48,7 +48,7 @@ void	copy_env(t_container *book)
 	free(old_envp);
 }
 
-void	unset_var(char *str, t_container *book, int index)
+void	unset_var(t_container *book, int index)
 {
 	copy_env(book);
 	while (book->envp[index])
@@ -79,7 +79,7 @@ T_BOOL	unset(t_token *leaf, t_container *book)
 			continue ;
 		}
 		else
-			unset_var(leaf->args[i], book, index);
+			unset_var(book, index);
 	}
 	return (exit);
 }

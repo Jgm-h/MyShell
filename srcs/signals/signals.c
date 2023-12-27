@@ -8,6 +8,8 @@ static void	handle_sigquit(void)
 
 static void	handle_sigint(void)
 {
+	if (g_status == EXECUTION)
+		return ;
 	if (g_status == HEREDOC)
 	{
 		g_status = ABORT_HEREDOC;

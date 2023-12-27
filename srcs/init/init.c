@@ -1,31 +1,27 @@
 #include "minishell.h"
 #include "init.h"
 
-void	init(t_container **book, char **envp, int argc)
+unsigned int init(t_container **book, char **envp, int argc)
 {
 	if (argc != 1)
-	{
-		perror("Usage: ./minishell {don't use any arguments}\n");
-		exit(1);
-	}
+		return (my_print_error("Usage: ./minishell {don't use any arguments}\n"));
 	if (!isatty(0) || !isatty(1) || !isatty(2))
-	{
-		perror("./minishell error with stream\n");
-		exit(1);
-	}
+		return (my_print_error("./minishell error with stream\n"));
 	(*book) = ft_calloc(1, sizeof (t_container));
 	if (!(*book))
-		exit(1);
+		return (my_print_error("minishell-2.0: malloc error"));
 	(*book)->exit_status = 0;
 	(*book)->prompt = "minishell-2.0$";
-	if (!getcwd((*book)->cwd, MAX_PATH_LEN + 1))
-	{
-		perror("minishell: getcwd: ");
-		exit(1);
-	}
+	(*book)->cwd = getcwd(NULL, 0);
+	if (!(*book)->cwd)
+		return (my_print_error("minishell: getcwd: "));
 	if (!init_envp(*book, envp) || !init_paths(*book))
-		exit(1);
+		return (1);
+	(*book)->prompt = ft_strdup("minishell-2.0$");
+	if (!(*book)->prompt)
+		return (my_print_error("minishell-2.0: malloc error"));
 	init_termios();
+	return (1);
 }
 
 void	init_termios(void)
@@ -34,13 +30,13 @@ void	init_termios(void)
 
 	if (tcgetattr(STDIN_FILENO, &term) == -1)
 	{
-		perror("tcgetattr");
+		my_print_error("tcgetattr");
 		return ;
 	}
 	term.c_lflag &= ~ECHOCTL;
 	if (tcsetattr(STDIN_FILENO, TCSANOW, &term) == -1)
 	{
-		perror("tcsetattr");
+		my_print_error("tcsetattr");
 		return ;
 	}
 }
@@ -48,7 +44,6 @@ void	init_termios(void)
 unsigned int	init_paths(t_container *book)
 {
 	int		i;
-	char	*hook;
 
 	i = 0;
 	while (ft_strncmp(book->envp[i], "PATH", 4))
@@ -59,7 +54,7 @@ unsigned int	init_paths(t_container *book)
 	i = 0;
 	while (book->paths[i])
 	{
-		book->paths[i] = ft_strjoin(book->paths[i], "/");
+		book->paths[i] = ft_strjoin(ft_strdup(book->paths[i]), ft_strdup("/"));
 		i++;
 	}
 	return (TRUE);

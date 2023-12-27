@@ -54,7 +54,7 @@ void	export_value(char *env, char *key, char *value)
 	hook = env;
 	env = ft_calloc(ft_strlen(key) + ft_strlen(value) + 1, sizeof(char));
 	if (!env)
-		my_perror("malloc error");
+		my_print_error("malloc error");
 	free(hook);
 	ft_strlcpy(env, key, ft_strlen(key) + 1);
 	ft_strlcpy(env + ft_strlen(key), value, ft_strlen(value) + 1);
@@ -78,8 +78,8 @@ T_BOOL	my_access(char *file, int flag)
 {
 	if (access(file, flag) == -1)
 	{
-		perror("minishell-2.0: permission denied: ");
-		perror(file);
+		my_print_error("minishell-2.0: permission denied: ");
+		my_print_error(file);
 		return (FALSE);
 	}
 	else
@@ -90,16 +90,17 @@ int	my_dup2(int fd_file, int to_dup)
 {
 	if (dup2(fd_file, to_dup) == -1)
 	{
-		perror("minishell-2.0: dup2 failed");
+		my_print_error("minishell-2.0: dup2 failed");
 		return (-1);
 	}
 	else
 		return (1);
 }
 
-void	my_perror(char *str)
+void	my_perror(char *str, t_container *book)
 {
-	perror(str);
+	my_print_error(str);
+	free_all(book);
 	exit(errno);
 }
 
@@ -119,7 +120,7 @@ int	fork1(void)
 	pid = fork();
 	if (pid == -1)
 	{
-		perror("fork");
+		my_print_error("fork");
 		exit(EXIT_FAILURE);
 	}
 	return (pid);
@@ -135,4 +136,43 @@ void	manage_heredoc(t_token *token, int *pipes)
 	write(pipes[0], token->heredoc, i);
 	close(pipes[1]);
 	close(pipes[0]);
+}
+
+T_BOOL	check_builtin(char *str)
+{
+	if (!ft_strncmp(str, "cd", 3))
+		return (TRUE);
+	if (!ft_strncmp(str, "echo", 5))
+		return (TRUE);
+	if (!ft_strncmp(str, "env", 4))
+		return (TRUE);
+	if (!ft_strncmp(str, "exit", 5))
+		return (TRUE);
+	if (!ft_strncmp(str, "export", 7))
+		return (TRUE);
+	if (!ft_strncmp(str, "pwd", 4))
+		return (TRUE);
+	if (!ft_strncmp(str, "unset", 6))
+		return (TRUE);
+	return (FALSE);
+}
+
+int my_print_error(char *str)
+{
+	write(2, str, ft_strlen(str));
+	return (0);
+}
+
+void	free_array(char **array)
+{
+	int	i;
+
+	i = 0;
+	while (array[i])
+	{
+		array[i] = NULL;
+		free(array[i++]);
+	}
+	array = NULL;
+	free(array);
 }

@@ -4,7 +4,7 @@
  * getcwd space needs to be freed
  * */
 
-int	pwd(t_token *leaf, t_container *)
+int	pwd(void)
 {
 	char	*cwd;
 

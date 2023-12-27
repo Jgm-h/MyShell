@@ -19,14 +19,6 @@ int	ft_redirlen(char *redir)
 	return (i);
 }
 
-T_BOOL	check_char_redir(char c)
-{
-	if (c == '|' \
-	|| c == '&' || c == ')' || c == '(')
-		return (FALSE);
-	return (TRUE);
-}
-
 T_BOOL	check_pipe_position(char *input)
 {
 	int	i;
@@ -64,12 +56,12 @@ T_BOOL	check_heredoc_start(char *input)
 			i++;
 		if (input[i] == '(')
 		{
-			perror("syntax error near unexpected token `('");
+			my_print_error("syntax error near unexpected token `('");
 			return (FALSE);
 		}
 		if (input[i] == ')')
 		{
-			perror("syntax error near unexpected token `)'");
+			my_print_error("syntax error near unexpected token `)'");
 			return (FALSE);
 		}
 		while (input[i] == ' ')
@@ -92,12 +84,12 @@ T_BOOL	check_heredoc_alone(char *input, int i, T_BOOL first)
 		{
 			if (first)
 			{
-				perror("syntax error near unexpected token '<<'");
+				my_print_error("syntax error near unexpected token '<<'");
 				return (FALSE);
 			}
 			if (!input[i + 2])
 			{
-				perror("syntax error near unexpected token `newline'\n");
+				my_print_error("syntax error near unexpected token `newline'\n");
 				return (FALSE);
 			}
 			first = TRUE;

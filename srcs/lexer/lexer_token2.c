@@ -39,7 +39,7 @@ unsigned int	ft_strcpy_lexer(char **input, int i, char *env, int j)
 	(*input) = ft_calloc(ft_strlen(*input) + ft_strlen(env) \
 			- ft_keysize_input((*input) + i) + 1, sizeof (char));
 	if (!*input || !exp)
-		my_perror("malloc");
+		my_print_error("malloc");
 	while (++j < i)
 		(*input)[j] = exp[j];
 	k = -1;
@@ -68,10 +68,10 @@ void	clean_quotes(char **input, T_BOOL in_double, T_BOOL in_simple, int i)
 {
 	int		j;
 
-	while ((*input[i]))
+	while ((*input)[i])
 	{
 		if (((*input)[i] == '\"' && !in_simple) || \
-			((*input[i]) == '\'' && !in_double))
+			((*input)[i] == '\'' && !in_double))
 		{
 			if ((*input)[i] == '\"')
 				in_double = !in_double;
