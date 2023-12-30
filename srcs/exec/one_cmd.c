@@ -72,7 +72,7 @@ int	execute(t_token *leaf, t_container *book, t_pipes pipes_exec)
 	}
 	if (fork1() == 0)
 	{
-		if (leaf->heredocgit )
+		if (leaf->heredoc)
 			dup2(pipes[1], STDIN_FILENO);
 		if (check_builtin(leaf->args[0]))
 			execute_builtins(leaf, book, pipes_exec);

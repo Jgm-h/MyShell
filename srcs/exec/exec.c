@@ -32,7 +32,12 @@ t_pipes	init_pipe(T_BOOL first, T_BOOL last)
 	return (ret);
 }
 
-
+t_token *find_left(t_token *to_find)
+{
+	while (to_find->left)
+		to_find = to_find->left;
+	return (to_find);
+}
 
 /* TODO;
  * 	- [ ] code find left and find right
@@ -45,7 +50,7 @@ T_BOOL	execute_pipe(t_token *leaf, t_container *book, t_pipes pipes)
 	t_pipes	left;
 	t_pipes	right;
 
-	left = init_pipe(leaf->left->first, leaf->left->last);
+	left = init_pipe(find_left(leaf)->first, find_left(leaf)->last);
 	right = init_pipe(leaf->right->first, leaf->right->last);
 	r_executor(leaf->left, book, left);
 	//close_fd(find_left(leaf->left)->first, find_left(leaf->left)->last);
@@ -61,11 +66,12 @@ T_BOOL	execute_pipe(t_token *leaf, t_container *book, t_pipes pipes)
  * 		- [ ] un process qui est arrete par signal c'est une erreur
  * 		- [ ] un process qui est arrete par un code != 0 c'est pas une erreur
  * 	- [ ] check status between subgroups
+ *  - [ ] remettre a zero le nombre de process
  * */
 T_BOOL exec_and(t_token *leaf, t_container *book)
 {
 
-
+	waitpid();
 	r_executor(leaf->left, book, )
 		return (r_executor(leaf->right, book, pipes));
 	else
@@ -75,6 +81,7 @@ T_BOOL exec_and(t_token *leaf, t_container *book)
 /* TODO:
  * 	- [ ] waitpid 0 for each sub group
  * 	- [ ] check status between subgroups
+* - [ ] remettre a zero le nombre de process
  * */
 T_BOOL exec_or(t_token *leaf, t_container *book)
 {
@@ -110,6 +117,7 @@ T_BOOL	r_executor(t_token *leaf, t_container *book, t_pipes pipes)
  * - [ ] handle status for subgroup here
  * so somehow i have a master group that monitors all the subgroups
  * maybe i should check if the head is a && or an || (and then maybe i should have a master group)
+ * - [ ] remettre a zero le nombre de process
  * */
 T_BOOL exec(t_container *book)
 {
@@ -120,5 +128,6 @@ T_BOOL exec(t_container *book)
 	g_status = EXECUTION;
 	if (!r_executor(book->head, book, pipes))
 		// handle g_status
+		//waitpid all groups
 	return (r_executor(book->head, book, pipes));
 }
